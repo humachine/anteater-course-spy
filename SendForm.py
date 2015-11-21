@@ -1,7 +1,18 @@
 import re
 from mechanize import Browser
 
-watchlist = [("COMPSCI", "34840")]
+class subject:
+    def __init__(self, dept, course, wl=True, wlmax=10):
+        self.dept = dept
+        self.course = course
+        self.wl = wl
+        self.wlmax = wlmax
+    
+def triggernotification(inp):
+    print 'Send Email'
+
+watchlist = [subject("COMPSCI", "34840", True, 15)]
+
 
 br = Browser()
 br.set_handle_robots(False)
@@ -13,12 +24,11 @@ if 1:
 #def scrape(inp):
     forms = [f for f in br.forms()]
     f = forms[1]
-    dept, course = inp
-    f["Dept"] = [dept]
+    f["Dept"] = [inp.dept]
     submit_response = br.submit(name="Submit", label="Display Web Results")
     out=submit_response.read()
     
-    start = out.find(course)
+    start = out.find(inp.course)
     end = out.find('\n', start)
     line = out[start:end]
     aa=line.split(r'</td>')
@@ -38,10 +48,13 @@ if 1:
         t=curr.split('/')
         curr = int(t[-1])
     
+    print MAXSTRENGTH, curr, waitlist
     
-    print MAXSTRENGTH, curr
+    if curr < MAXSTRENGTH:
+        triggernotification(inp)
+    elif inp.wl == True and waitlist < inp.wlmax:
+        triggernotification(inp)
     
-    print len(bb)
 #    print out[locstart:locend]
 #    locend = out[loc:].find('\n')
 #    line = out[loc:loc+locend]
